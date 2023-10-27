@@ -6,13 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Collection;
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class AuthenticationResponse {
+
+    private String message;
 
     private String token;
 
@@ -21,6 +21,9 @@ public class AuthenticationResponse {
     private Role role;
 
     private Integer id;
+
+
+
 
 
 

@@ -4,6 +4,7 @@ package com.guess.secure1.config;
 import java.io.IOException;
 
 
+import org.hibernate.dialect.function.CaseLeastGreatestEmulation;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +18,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
+
 
 
 @Component
@@ -48,11 +51,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter{
         }
 
         jwt= authHeader.substring(7);
+        System.out.println(request.getHeaders("token"));
+
+        System.out.println(jwt);
+        String secretKey = request.getParameter("secret");
+        String clientKey = request.getParameter("client");
+
+
         userEmail= jwtService.extractUsername(jwt);//todo extract the userEmail from JWT token
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication()==null) {
             UserDetails userDetails =  this.userDetailsService.loadUserByUsername(userEmail);
-            if(jwtService.isTokenValid(jwt, userDetails)) {
+            if(jwtService.isTokenValid(jwt, userDetails)&& jwtService.isValidSecretAndClientKeys(secretKey, clientKey)) {
                 UsernamePasswordAuthenticationToken authToken= new UsernamePasswordAuthenticationToken(
                         userDetails,null, userDetails.getAuthorities());
                 authToken.setDetails(

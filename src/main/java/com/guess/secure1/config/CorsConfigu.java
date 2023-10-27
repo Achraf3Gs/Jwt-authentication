@@ -16,7 +16,7 @@ public class CorsConfigu {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedOrigins("http://localhost:4200")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE")
+                        .allowedMethods("GET", "POST", "PUT", "DELETE","PATCH")
                         .allowedHeaders("Authorization", "Content-Type")
                         .allowCredentials(true);
             }

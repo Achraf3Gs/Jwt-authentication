@@ -22,7 +22,8 @@ import io.jsonwebtoken.security.Keys;
 @RequiredArgsConstructor
 public class JwtService {
 
-
+    private static final String secret="achrafou";
+    private static final String client="123456789";
 
     private static final String SECRET_KEY="8ba5bcf689a7b166bdbf984fb4668ecce6070d01db7e7078d2994ffffac48034";
 
@@ -42,16 +43,25 @@ public class JwtService {
 
 
     public String generateToken(User user) {
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("id",user.getId()+"");
+        claims.put("username", user.getFirstname());
+        claims.put("role", user.getRole());
                 return Jwts
                 .builder()
-                .setSubject(String.format("%s,%s,%s",user.getFirstname(),user.getEmail(),user.getId()))
+                        .setClaims(claims)
+                .setSubject(String.format("%s",user.getEmail()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
+                .setExpiration(new Date(System.currentTimeMillis()+1000*60*120))
                 .signWith(getSignInKey(),SignatureAlgorithm.HS256)
                 .compact();
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String username= extractUsername(token);
+        return (username.equals(userDetails.getUsername()))&& !isTokenExpired(token);
+    }
+    public boolean isTokenAdminValid(String token, UserDetails userDetails) {
         final String username= extractUsername(token);
         return (username.equals(userDetails.getUsername()))&& !isTokenExpired(token);
     }
@@ -76,6 +86,13 @@ public class JwtService {
     private Key getSignInKey() {
         byte[] keyBytes= Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+   boolean isValidSecretAndClientKeys(String secretKey, String clientKey) {
+        // Implement your logic to validate the secret_key and client_key
+        // Return true if they are valid, false if they are not
+        return (secretKey != null && secretKey.equals(secret))
+                && (clientKey != null && clientKey.equals(client));
     }
 
 
